@@ -12,7 +12,7 @@ resources:
       uri: ssh://git@github.com:hreeder/kube-iac.git
       private_key: ((github.deploy_key))
 
-  - name: helm
+  - name: kube-cluster
     type: helm
     source:
       cluster_url: ((kube.cluster_url))
@@ -22,7 +22,19 @@ resources:
 jobs:
   - name: influxdb
     plan:
-      - put: helm
+      - get: kube-iac
+        trigger: true
+      - put: kube-cluster
         params:
           chart: stable/influxdb
           release: influxdb
+  
+  - name: grafana
+    plan:
+      - get: kube-iac
+        trigger: true
+      - put: kube-cluster
+        params:
+          chart: stable/grafana
+          release: grafana
+          values: kube-iac/helm-apps/grafana.yaml
