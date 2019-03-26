@@ -4,6 +4,11 @@ resource_types:
     type: docker-image
     source:
       repository: linkyard/concourse-helm-resource
+  
+  - name: discord
+    type: docker-image
+    source:
+      repository: trivigy/discord-resource
 
 resources:
   - name: kube-iac
@@ -15,10 +20,17 @@ resources:
 
   - name: kube-cluster
     type: helm
+    check_every: 999999h
     source:
       cluster_url: ((kube.cluster_url))
       cluster_ca: ((kube.cluster_ca))
       token: ((kube.token))
+  
+  - name: discord
+    type: discord
+    check_every: 999999h
+    source:
+      token: ((discord.token))
 
 jobs:
   - name: prometheus
@@ -30,6 +42,26 @@ jobs:
           chart: stable/prometheus
           release: prometheus
           values: kube-iac/helm-apps/grafana.yaml
+        on_success:
+          put: discord
+          params:
+            channel: "((discord.channel_id))"
+            color: 0x5CB85C
+            title: "[Concourse] Helm App Deployed"
+            message: |
+              **Pipeline**: helm-apps
+              **Job**: prometheus
+              :airplane_departure: Prometheus has now been deployed/updated
+        on_failure:
+          put: discord
+          params:
+            channel: "((discord.channel_id))"
+            color: 0xFF0000
+            title: "[Concourse] Helm App FAILURE"
+            message: |
+              **Pipeline**: helm-apps
+              **Job**: prometheus
+              :airplane_departure: Prometheus has FAILED to deploy/update. ROLLING BACK.
   
   - name: grafana
     plan:
@@ -40,6 +72,26 @@ jobs:
           chart: stable/grafana
           release: grafana
           values: kube-iac/helm-apps/grafana.yaml
+        on_success:
+          put: discord
+          params:
+            channel: "((discord.channel_id))"
+            color: 0x5CB85C
+            title: "[Concourse] Helm App Deployed"
+            message: |
+              **Pipeline**: helm-apps
+              **Job**: grafana
+              :airplane_departure: Grafana has now been deployed/updated
+        on_failure:
+          put: discord
+          params:
+            channel: "((discord.channel_id))"
+            color: 0xFF0000
+            title: "[Concourse] Helm App FAILURE"
+            message: |
+              **Pipeline**: helm-apps
+              **Job**: grafana
+              :airplane_departure: Grafana has FAILED to deploy/update. ROLLING BACK.
 
   - name: traefik
     plan:
@@ -50,3 +102,23 @@ jobs:
           chart: stable/traefik
           release: traefik
           values: kube-iac/helm-apps/traefik.yaml
+        on_success:
+          put: discord
+          params:
+            channel: "((discord.channel_id))"
+            color: 0x5CB85C
+            title: "[Concourse] Helm App Deployed"
+            message: |
+              **Pipeline**: helm-apps
+              **Job**: traefik
+              :airplane_departure: Træfik has now been deployed/updated
+        on_failure:
+          put: discord
+          params:
+            channel: "((discord.channel_id))"
+            color: 0xFF0000
+            title: "[Concourse] Helm App FAILURE"
+            message: |
+              **Pipeline**: helm-apps
+              **Job**: traefik
+              :airplane_departure: Træfik has FAILED to deploy/update. ROLLING BACK.
