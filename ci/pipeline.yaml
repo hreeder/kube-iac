@@ -1,0 +1,28 @@
+---
+resource_types:
+  - name: helm
+    type: docker-image
+    source:
+      repository: linkyard/concourse-helm-resource
+
+resources:
+  - name: kube-iac
+    type: git
+    source:
+      uri: ssh://git@github.com:hreeder/kube-iac.git
+      private_key: ((github.deploy_key))
+
+  - name: helm
+    type: helm
+    source:
+      cluster_url: ((kube.cluster_url))
+      cluster_ca: ((kube.cluster_ca))
+      token: ((kube.token))
+
+jobs:
+  - name: influxdb
+    plan:
+      - put: helm
+        params:
+          chart: stable/influxdb
+          release: influxdb

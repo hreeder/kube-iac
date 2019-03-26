@@ -1,0 +1,31 @@
+metrics:
+  prometheus:
+    enabled: true
+    restrictAccess: true
+
+service:
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+
+proxyProtocol:
+  enabled: true
+  trustedIPs:
+    - 10.0.0.0/8
+
+rbac:
+  enabled: true
+
+ssl:
+  enabled: true
+  enforced: true
+
+acme:
+  enabled: true
+  staging: false
+  challengeType: dns-01
+  email: harry@reeder.dev
+  dnsProvider:
+    name: cloudflare
+    cloudflare:
+      CLOUDFLARE_EMAIL: harry@harryreeder.co.uk
+      CLOUDFLARE_API_KEY: ***REMOVED***

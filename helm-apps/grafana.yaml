@@ -1,0 +1,11 @@
+ingress:
+  enabled: true
+  hosts:
+    - grafana.tbrb.dev
+
+plugins:
+  - grafana-piechart-panel
+
+persistence:
+  enabled: true
+  size: 1Gi
