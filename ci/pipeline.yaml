@@ -9,8 +9,9 @@ resources:
   - name: kube-iac
     type: git
     source:
-      uri: ssh://git@github.com:hreeder/kube-iac.git
-      private_key: ((github.deploy_key))
+      uri: git@github.com:hreeder/kube-iac.git
+      private_key: |
+        ((github.deploy_key))
 
   - name: kube-cluster
     type: helm
@@ -20,14 +21,15 @@ resources:
       token: ((kube.token))
 
 jobs:
-  - name: influxdb
+  - name: prometheus
     plan:
       - get: kube-iac
         trigger: true
       - put: kube-cluster
         params:
-          chart: stable/influxdb
-          release: influxdb
+          chart: stable/prometheus
+          release: prometheus
+          values: kube-iac/helm-apps/grafana.yaml
   
   - name: grafana
     plan:
@@ -38,3 +40,13 @@ jobs:
           chart: stable/grafana
           release: grafana
           values: kube-iac/helm-apps/grafana.yaml
+
+  - name: traefik
+    plan:
+      - get: kube-iac
+        trigger: true
+      - put: kube-cluster
+        params:
+          chart: stable/traefik
+          release: traefik
+          values: kube-iac/helm-apps/traefik.yaml
