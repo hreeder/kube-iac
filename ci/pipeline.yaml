@@ -11,12 +11,32 @@ resource_types:
       repository: trivigy/discord-resource
 
 resources:
-  - name: kube-iac
+  - name: kube-iac-prometheus
     type: git
     source:
       uri: git@github.com:hreeder/kube-iac.git
       private_key: |
         ((github.deploy_key))
+      watch:
+        - helm-apps/prometheus.yaml
+    
+  - name: kube-iac-grafana
+    type: git
+    source:
+      uri: git@github.com:hreeder/kube-iac.git
+      private_key: |
+        ((github.deploy_key))
+      watch:
+        - helm-apps/grafana.yaml
+
+  - name: kube-iac-traefik
+    type: git
+    source:
+      uri: git@github.com:hreeder/kube-iac.git
+      private_key: |
+        ((github.deploy_key))
+      watch:
+        - helm-apps/traefik.yaml
 
   - name: kube-cluster
     type: helm
@@ -35,13 +55,13 @@ resources:
 jobs:
   - name: prometheus
     plan:
-      - get: kube-iac
+      - get: kube-iac-prometheus
         trigger: true
       - put: kube-cluster
         params:
           chart: stable/prometheus
           release: prometheus
-          values: kube-iac/helm-apps/grafana.yaml
+          values: kube-iac-prometheus/helm-apps/grafana.yaml
         on_success:
           put: discord
           params:
@@ -65,13 +85,13 @@ jobs:
   
   - name: grafana
     plan:
-      - get: kube-iac
+      - get: kube-iac-grafana
         trigger: true
       - put: kube-cluster
         params:
           chart: stable/grafana
           release: grafana
-          values: kube-iac/helm-apps/grafana.yaml
+          values: kube-iac-grafana/helm-apps/grafana.yaml
         on_success:
           put: discord
           params:
@@ -95,13 +115,13 @@ jobs:
 
   - name: traefik
     plan:
-      - get: kube-iac
+      - get: kube-iac-traefik
         trigger: true
       - put: kube-cluster
         params:
           chart: stable/traefik
           release: traefik
-          values: kube-iac/helm-apps/traefik.yaml
+          values: kube-iac-traefik/helm-apps/traefik.yaml
         on_success:
           put: discord
           params:
