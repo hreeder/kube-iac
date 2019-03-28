@@ -6,6 +6,7 @@ metrics:
 service:
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+    service.beta.kubernetes.io/tbrb-test-annotation: "true"
 
 proxyProtocol:
   enabled: true
