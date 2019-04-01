@@ -11,6 +11,8 @@ ingress:
 plugins:
   - grafana-piechart-panel
 
+envFromSecret: grafana-env
+
 grafana.ini:
   paths:
     data: /var/lib/grafana/data
@@ -29,7 +31,6 @@ grafana.ini:
     name: id.tbrb.dev
     enabled: true
     client_id: grafana
-    client_secret: 456d3656-6043-4b1f-8c9f-c575fae7d035
     scopes: openid email name
     auth_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/auth
     token_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/token
