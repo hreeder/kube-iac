@@ -1,3 +1,8 @@
+---
+meta:
+  name: traefik
+  chart: stable/traefik
+
 metrics:
   prometheus:
     enabled: true

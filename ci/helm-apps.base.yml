@@ -1,0 +1,26 @@
+---
+resource_types:
+  - name: helm
+    type: docker-image
+    source:
+      repository: linkyard/concourse-helm-resource
+  
+  - name: discord
+    type: docker-image
+    source:
+      repository: trivigy/discord-resource
+
+resources:
+  - name: kube-cluster
+    type: helm
+    check_every: 999999h
+    source:
+      cluster_url: ((kube.cluster_url))
+      cluster_ca: ((kube.cluster_ca))
+      token: ((kube.token))
+  
+  - name: discord
+    type: discord
+    check_every: 999999h
+    source:
+      token: ((discord.token))

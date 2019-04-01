@@ -1,0 +1,10 @@
+---
+meta:
+  name: keycloak
+  chart: stable/keycloak
+
+keycloak:
+  ingress:
+    enabled: true
+    hosts:
+      - id.tbrb.dev

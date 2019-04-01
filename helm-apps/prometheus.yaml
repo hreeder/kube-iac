@@ -1,3 +1,8 @@
+---
+meta:
+  name: prometheus
+  chart: stable/prometheus
+
 serverFiles:
   prometheus.yml:
     scrape_config:

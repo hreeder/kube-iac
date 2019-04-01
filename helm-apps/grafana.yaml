@@ -1,3 +1,8 @@
+---
+meta:
+  name: grafana
+  chart: stable/grafana
+
 ingress:
   enabled: true
   hosts:
@@ -6,6 +11,27 @@ ingress:
 plugins:
   - grafana-piechart-panel
 
-persistence:
-  enabled: true
-  size: 1Gi
+grafana.ini:
+  paths:
+    data: /var/lib/grafana/data
+    logs: /var/log/grafana
+    plugins: /var/lib/grafana/plugins
+    provisioning: /etc/grafana/provisioning
+  server:
+    root_url: https://grafana.tbrb.dev
+  analytics:
+    check_for_updates: true
+  log:
+    mode: console
+  grafana_net:
+    url: https://grafana.net
+  auth.generic_oauth:
+    name: id.tbrb.dev
+    enabled: true
+    client_id: grafana
+    client_secret: 456d3656-6043-4b1f-8c9f-c575fae7d035
+    scopes: openid email name
+    auth_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/auth
+    token_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/token
+    api_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/userinfo
+      
