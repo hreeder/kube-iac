@@ -35,3 +35,13 @@ grafana.ini:
     auth_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/auth
     token_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/token
     api_url: https://id.tbrb.dev/auth/realms/tbrb-dev/protocol/openid-connect/userinfo
+
+datasources:
+ datasources.yaml:
+   apiVersion: 1
+   datasources:
+   - name: Prometheus
+     type: prometheus
+     url: http://prometheus-server
+     access: server
+     isDefault: true
