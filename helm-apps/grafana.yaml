@@ -43,5 +43,5 @@ datasources:
    - name: Prometheus
      type: prometheus
      url: http://prometheus-server
-     access: server
+     access: proxy
      isDefault: true
