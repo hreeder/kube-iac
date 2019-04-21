@@ -45,3 +45,9 @@ datasources:
      url: http://prometheus-server
      access: proxy
      isDefault: true
+
+dashboards:
+  traefik-by-backend:
+    gnetId: 4475
+    revision: 4
+    datasource: Prometheus

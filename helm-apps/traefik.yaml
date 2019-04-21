@@ -13,6 +13,11 @@ service:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
     service.beta.kubernetes.io/tbrb-test-annotation: "true"
 
+deployment:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+
 proxyProtocol:
   enabled: true
   trustedIPs:
