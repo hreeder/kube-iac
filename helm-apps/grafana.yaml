@@ -11,6 +11,10 @@ ingress:
 plugins:
   - grafana-piechart-panel
 
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+
 envFromSecret: grafana-env
 
 grafana.ini:
@@ -64,4 +68,8 @@ dashboards:
     traefik-by-backend:
       gnetId: 4475
       revision: 4
+      datasource: Prometheus
+    prometheus-2:
+      gnetId: 3662
+      revision: 2
       datasource: Prometheus
