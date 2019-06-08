@@ -1,0 +1,8 @@
+---
+meta:
+  name: kubedb-catalog
+  chart: appscode/kubedb
+  namespace: kube-system
+  repo:
+    name: appscode
+    url: https://charts.appscode.com/stable/
