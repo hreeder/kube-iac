@@ -38,6 +38,4 @@ acme:
   email: harry@reeder.dev
   dnsProvider:
     name: cloudflare
-    cloudflare:
-      CLOUDFLARE_EMAIL: harry@harryreeder.co.uk
-      CLOUDFLARE_API_KEY: ***REMOVED***
+    existingSecretName: traefik-cloudflare
