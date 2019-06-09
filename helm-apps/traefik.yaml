@@ -2,6 +2,7 @@
 meta:
   name: traefik
   chart: stable/traefik
+  namespace: kube-system
 
 metrics:
   prometheus:
