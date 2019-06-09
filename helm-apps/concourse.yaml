@@ -1,0 +1,40 @@
+---
+meta:
+  name: concourse
+  chart: stable/concourse
+  database: concourse.yaml
+
+web:
+  ingress:
+    enabled: true
+    hosts:
+      - ci.tbrb.dev
+
+postgresql:
+  enabled: false
+
+secrets:
+  create: false
+
+concourse:
+  worker:
+    baggageclaim:
+      driver: overlay
+  web:
+    externalUrl: https://ci.tbrb.dev
+    postgres:
+      host: concourse-db
+      database: pgdb
+    auth:
+      github:
+        enabled: true
+      mainTeam:
+        localUser: concourse
+        github:
+          user: hreeder
+    kubernetes:
+      enabled: false
+    vault:
+      enabled: true
+      url: https://vault.err.wtf
+      authBackend: approle
