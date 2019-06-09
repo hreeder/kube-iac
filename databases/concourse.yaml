@@ -18,3 +18,8 @@ spec:
   terminationPolicy: DoNotTerminate
   updateStrategy:
     type: RollingUpdate
+  podTemplate:
+    spec:
+      env:
+      - name: POSTGRES_DB
+        value: concourse

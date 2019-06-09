@@ -24,7 +24,7 @@ concourse:
     externalUrl: https://ci.tbrb.dev
     postgres:
       host: concourse-db
-      database: pgdb
+      database: concourse
     auth:
       github:
         enabled: true
