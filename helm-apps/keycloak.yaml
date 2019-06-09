@@ -2,6 +2,7 @@
 meta:
   name: keycloak
   chart: stable/keycloak
+  database: keycloak.yaml
 
 keycloak:
   ingress:
