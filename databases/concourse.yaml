@@ -6,6 +6,8 @@ spec:
   version: "10.2-v2"
   storageType: Durable
   replicas: 1
+  databaseSecret:
+    secretName: concourse-web
   storage:
     storageClassName: do-block-storage
     accessModes:
