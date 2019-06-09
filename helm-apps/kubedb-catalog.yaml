@@ -1,7 +1,7 @@
 ---
 meta:
   name: kubedb-catalog
-  chart: appscode/kubedb
+  chart: appscode/kubedb-catalog
   namespace: kube-system
   repo:
     name: appscode

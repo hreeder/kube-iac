@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 import os
 import sys
 
+from collections import namedtuple
 from pathlib import Path
 
 from ruamel.yaml import YAML
@@ -12,6 +14,7 @@ apps_folder = apps_folder.resolve()
 
 yaml = YAML()
 pipeline = {}
+repos = set()
 apps = []
 
 with open((Path(ci_folder) / 'helm-apps.base.yml').resolve()) as fp:
@@ -29,7 +32,11 @@ for base, _, files in os.walk(apps_folder):
                 apps.append(meta)
 
 for app in apps:
-    pipeline['resources'].append({
+    if "repo" in app:
+        Repo = namedtuple('Repo', ['name', 'url'])
+        repos.add(Repo(app['repo']['name'], app['repo']['url']))
+
+    resource = {
         'name': f'kube-iac-{app["name"]}',
         'type': 'git',
         'source': {
@@ -37,8 +44,36 @@ for app in apps:
             'private_key': LiteralScalarString('((github.deploy_key))'),
             'paths': [f'helm-apps/{app["chartFile"]}']
         }
-    })
-    pipeline['jobs'].append({
+    }
+
+    if "database" in app:
+        resource['source']['paths'].append(f"databases/{app['database']}")
+
+    pipeline['resources'].append(resource)
+
+    if "database" in app:
+        db_job = {
+            "name": f"{app['name']}-database",
+            "plan": [
+                {
+                    "get": f"kube-iac-{app['name']}",
+                    "trigger": True
+                },
+                {
+                    "put": "kube",
+                    "params": {
+                        "kubectl": f"apply -f kube-iac-{app['name']}/databases/{app['database']}"
+                    }
+                }
+            ]
+        }
+
+        if "namespace" in app:
+            db_job['plan'][1]['params']['namespace'] = app['namespace']
+
+        pipeline['jobs'].append(db_job)
+
+    job = {
         'name': app['name'],
         'plan': [
             {
@@ -46,7 +81,7 @@ for app in apps:
                 'trigger': True
             },
             {
-                'put': 'kube-cluster',
+                'put': 'kube-helm',
                 'params': {
                     'chart': app['chart'],
                     'release': app['name'],
@@ -72,6 +107,23 @@ for app in apps:
                 }
             }
         ]
-    })
+    }
+
+    if "namespace" in app:
+        job['plan'][1]['params']['namespace'] = app['namespace']
+    
+    if "database" in app:
+        job['plan'][0]['passed'] = [f"{app['name']}-database"]
+
+    pipeline['jobs'].append(job)
+
+for resource in pipeline['resources']:
+    if resource['type'] == 'helm':
+        resource['source']['repos'] = []
+        for repo in repos:
+            resource['source']['repos'].append({
+                "name": repo.name,
+                "url": repo.url
+            })
 
 yaml.dump(pipeline, sys.stdout)

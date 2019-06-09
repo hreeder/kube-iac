@@ -1,24 +1,34 @@
 ---
 resource_types:
+  - name: kube
+    type: docker-image
+    source:
+      repository: zlabjp/kubernetes-resource
+      tag: "1.13"
   - name: helm
     type: docker-image
     source:
       repository: linkyard/concourse-helm-resource
-  
   - name: discord
     type: docker-image
     source:
       repository: trivigy/discord-resource
-
 resources:
-  - name: kube-cluster
+  - name: kube
+    type: kube
+    source:
+      server: ((kube.cluster_url))
+      certificate_authority: ((kube.cluster_ca))
+      token: ((kube.token))
+  - name: kube-helm
     type: helm
     check_every: 999999h
     source:
       cluster_url: ((kube.cluster_url))
-      cluster_ca: ((kube.cluster_ca))
+      cluster_ca: ((kube.cluster_ca_b64))
       token: ((kube.token))
-  
+      helm_init_server: true
+      tiller_service_account: tiller
   - name: discord
     type: discord
     check_every: 999999h
