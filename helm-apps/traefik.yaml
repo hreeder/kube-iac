@@ -31,6 +31,9 @@ ssl:
   enabled: true
   enforced: true
 
+gzip:
+  enabled: false
+
 acme:
   enabled: true
   staging: false
