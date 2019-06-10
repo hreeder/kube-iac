@@ -3,6 +3,9 @@ meta:
   name: concourse
   chart: stable/concourse
   database: concourse.yaml
+  secrets:
+    - concourse-web.yaml
+    - concourse-worker.yaml
 
 web:
   ingress:

@@ -42,14 +42,45 @@ for app in apps:
         'source': {
             'uri': 'git@github.com:hreeder/kube-iac.git',
             'private_key': LiteralScalarString('((github.deploy_key))'),
+            'git_crypt_key': LiteralScalarString('((github.git_crypt_key))'),
             'paths': [f'helm-apps/{app["chartFile"]}']
         }
     }
+
+    if "secrets" in app:
+        resource['source']['paths'].extend([f"secrets/{secret}" for secret in app['secrets']])
 
     if "database" in app:
         resource['source']['paths'].append(f"databases/{app['database']}")
 
     pipeline['resources'].append(resource)
+
+    if "secrets" in app:
+        secrets_job = {
+            "name": f"{app['name']}-secrets",
+            "plan": [
+                {
+                    "get": f"kube-iac-{app['name']}",
+                    "trigger": True
+                }
+            ]
+        }
+
+        for secret in app['secrets']:
+            secret_task = {
+                "put": "kube",
+                "params": {
+                    "kubectl": f"apply -f kube-iac-{app['name']}/secrets/{secret}",
+                    "wait_until_ready": 0
+                }
+            }
+
+            if "namespace" in app:
+                secret_task['params']['namespace'] = app['namespace']
+
+            secrets_job['plan'].append(secret_task)        
+
+        pipeline['jobs'].append(secrets_job)
 
     if "database" in app:
         db_job = {
@@ -62,7 +93,8 @@ for app in apps:
                 {
                     "put": "kube",
                     "params": {
-                        "kubectl": f"apply -f kube-iac-{app['name']}/databases/{app['database']}"
+                        "kubectl": f"apply -f kube-iac-{app['name']}/databases/{app['database']}",
+                        "wait_until_ready": 0
                     }
                 }
             ]
@@ -70,6 +102,9 @@ for app in apps:
 
         if "namespace" in app:
             db_job['plan'][1]['params']['namespace'] = app['namespace']
+
+        if "secrets" in app:
+            db_job['plan'][0]['passed'] = [f"{app['name']}-secrets"]
 
         pipeline['jobs'].append(db_job)
 
