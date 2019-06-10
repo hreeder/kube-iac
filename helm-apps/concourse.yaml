@@ -38,3 +38,4 @@ concourse:
       enabled: true
       url: https://vault.err.wtf
       authBackend: approle
+      pathPrefix: concourse
