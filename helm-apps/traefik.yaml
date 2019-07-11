@@ -4,6 +4,9 @@ meta:
   chart: stable/traefik
   namespace: kube-system
 
+deploymentStrategy:
+  type: Recreate
+
 metrics:
   prometheus:
     enabled: true
