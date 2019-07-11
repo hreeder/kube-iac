@@ -1,0 +1,10 @@
+---
+meta:
+  name: prometheus-operator
+  chart: stable/prometheus-operator
+
+grafana:
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.tbrb.dev
