@@ -13,11 +13,19 @@ web:
     hosts:
       - ci.tbrb.dev
 
+worker:
+  nodeSelector:
+    doks.digitalocean.com/node-pool: threegig-pool
+
 postgresql:
   enabled: false
 
 secrets:
   create: false
+
+persistence:
+  worker:
+    storageClass: do-block-storage
 
 concourse:
   worker:
