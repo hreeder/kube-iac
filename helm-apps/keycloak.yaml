@@ -1,8 +1,11 @@
 ---
 meta:
   name: keycloak
-  chart: stable/keycloak
+  chart: codecentric/keycloak
   database: keycloak.yaml
+  repo:
+    name: codecentric
+    url: https://codecentric.github.io/helm-charts
 
 keycloak:
   ingress:
