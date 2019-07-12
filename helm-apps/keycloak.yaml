@@ -15,8 +15,8 @@ keycloak:
   persistence:
     deployPostgres: false
     dbVendor: postgres
-    existingSecret: keycloak-auth
-    existingSecretKey: admin
+    existingSecret: keycloak-db-auth
+    existingSecretKey: POSTGRES_PASSWORD
 
     dbName: keycloak
     dbHost: keycloak-db
