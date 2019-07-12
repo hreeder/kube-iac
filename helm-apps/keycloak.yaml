@@ -20,4 +20,4 @@ keycloak:
 
     dbName: keycloak
     dbHost: keycloak-db
-    dbUser: admin
+    dbUser: postgres
