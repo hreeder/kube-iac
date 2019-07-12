@@ -1,10 +1,11 @@
 apiVersion: kubedb.com/v1alpha1
 kind: Postgres
 metadata:
-  name: keycloak
+  name: keycloak-db
 spec:
   version: "10.2-v2"
   storageType: Durable
+  replicas: 1
   storage:
     storageClassName: "do-block-storage"
     accessModes:
@@ -13,3 +14,14 @@ spec:
       requests:
         storage: 1Gi
   terminationPolicy: DoNotTerminate
+  updateStrategy:
+    type: RollingUpdate
+  podTemplate:
+    spec:
+      env:
+      - name: POSTGRES_DB
+        value: keycloak
+  monitor:
+    agent: prometheus.io/builtin
+    prometheus:
+      port: 56790

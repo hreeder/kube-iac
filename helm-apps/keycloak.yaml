@@ -9,3 +9,12 @@ keycloak:
     enabled: true
     hosts:
       - id.tbrb.dev
+  persistence:
+    deployPostgres: false
+    dbVendor: postgres
+    existingSecret: keycloak-auth
+    existingSecretKey: admin
+
+    dbName: keycloak
+    dbHost: keycloak-db
+    dbUser: admin
