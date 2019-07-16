@@ -8,6 +8,6 @@ metadata:
     app: kibana
 spec:
   ports:
-  - port: 5601
+  - port: 8080
   selector:
     app: kibana

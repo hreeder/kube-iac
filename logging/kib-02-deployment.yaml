@@ -29,3 +29,15 @@ spec:
             value: http://elasticsearch:9200
         ports:
         - containerPort: 5601
+      - name: gatekeeper
+        image: keycloak/keycloak-gatekeeper
+        ports:
+        - containerPort: 8080
+        env:
+          - name: PROXY_UPSTREAM_URL
+            value: http://localhost:5601
+          - name: PROXY_LISTEN
+            value: 0.0.0.0:8080
+        envFrom:
+          - secretRef:
+              name: kibana-env
