@@ -2,6 +2,8 @@
 meta:
   name: prometheus-operator
   chart: stable/prometheus-operator
+  extra:
+    - grafana_dashboards/harry-all-nodes.yaml
 
 grafana:
   ingress:

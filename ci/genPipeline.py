@@ -20,6 +20,7 @@ apps = []
 with open((Path(ci_folder) / 'helm-apps.base.yml').resolve()) as fp:
     pipeline = yaml.load(fp)
 
+pipeline['groups'] = []
 pipeline['jobs'] = []
 
 for base, _, files in os.walk(apps_folder):
@@ -47,15 +48,13 @@ for app in apps:
         }
     }
 
+    group = {
+        "name": app['name'],
+        "jobs": []
+    }
+
     if "secrets" in app:
         resource['source']['paths'].extend([f"secrets/{secret}" for secret in app['secrets']])
-
-    if "database" in app:
-        resource['source']['paths'].append(f"databases/{app['database']}")
-
-    pipeline['resources'].append(resource)
-
-    if "secrets" in app:
         secrets_job = {
             "name": f"{app['name']}-secrets",
             "plan": [
@@ -81,8 +80,10 @@ for app in apps:
             secrets_job['plan'].append(secret_task)        
 
         pipeline['jobs'].append(secrets_job)
+        group['jobs'].append(secrets_job['name'])
 
     if "database" in app:
+        resource['source']['paths'].append(f"databases/{app['database']}")
         db_job = {
             "name": f"{app['name']}-database",
             "plan": [
@@ -107,6 +108,41 @@ for app in apps:
             db_job['plan'][0]['passed'] = [f"{app['name']}-secrets"]
 
         pipeline['jobs'].append(db_job)
+        group['jobs'].append(db_job['name'])
+
+    if "extra" in app:
+        resource['source']['paths'].extend(app['extra'])
+        extra_job = {
+            "name": f"{app['name']}-extra-resources",
+            "plan": [
+                {
+                    "get": f"kube-iac-{app['name']}",
+                    "trigger": True
+                }
+            ]
+        }
+
+        for extra_resource in app['extra']:
+            extra_resource_task = {
+                "put": "kube",
+                "params": {
+                    "kubectl": f"apply -f kube-iac-{app['name']}/{extra_resource}",
+                    "wait_until_ready": 0
+                }
+            }
+
+            if "namespace" in app:
+                extra_resource_task['params']['namespace'] = app['namespace']
+            
+            extra_job['plan'].append(extra_resource_task)
+
+        if "database" in app:
+            extra_job['plan'][0]['passed'] = [f"{app['name']}-database"]
+        elif "secrets" in app:
+            extra_job['plan'][0]['passed'] = [f"{app['name']}-secrets"]
+
+        pipeline['jobs'].append(extra_job)
+        group['jobs'].append(extra_job['name'])
 
     job = {
         'name': app['name'],
@@ -144,12 +180,20 @@ for app in apps:
         ]
     }
 
+    group['jobs'].append(job['name'])
+
     if "namespace" in app:
         job['plan'][1]['params']['namespace'] = app['namespace']
     
-    if "database" in app:
+    if "extra" in app:
+        job['plan'][0]['passed'] = [f"{app['name']}-extra-resources"]
+    elif "database" in app:
         job['plan'][0]['passed'] = [f"{app['name']}-database"]
+    elif "secrets" in app:
+        job['plan'][0]['passed'] = [f"{app['name']}-secrets"]
 
+    pipeline['resources'].append(resource)
+    pipeline['groups'].append(group)
     pipeline['jobs'].append(job)
 
 for resource in pipeline['resources']:
