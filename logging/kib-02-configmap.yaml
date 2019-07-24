@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kibana-gatekeeper
+  labels:
+    app: kibana
+data:
+  gatekeeper.yml: |
+    verbose: false
+    upstream-url: http://localhost:5601
+    listen: 0.0.0.0:8080    
+    resources:
+    - uri: "/*"
+      roles:
+      - kibana:access

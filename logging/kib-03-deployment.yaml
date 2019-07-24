@@ -31,13 +31,18 @@ spec:
         - containerPort: 5601
       - name: gatekeeper
         image: keycloak/keycloak-gatekeeper
+        args:
+          - --config
+          - /etc/gatekeeper/gatekeeper.yml
         ports:
         - containerPort: 8080
-        env:
-          - name: PROXY_UPSTREAM_URL
-            value: http://localhost:5601
-          - name: PROXY_LISTEN
-            value: 0.0.0.0:8080
+        volumeMounts:
+          - name:  gatekeeper-config
+            mountPath:  /etc/gatekeeper
         envFrom:
           - secretRef:
               name: kibana-env
+      volumes:
+      - name: gatekeeper-config
+        configMap:
+          name: kibana-gatekeeper

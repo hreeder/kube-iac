@@ -1,0 +1,112 @@
+---
+resource_types:
+- name: kube
+  type: docker-image
+  source:
+    repository: zlabjp/kubernetes-resource
+    tag: "1.14"
+# - name: discord
+#   type: docker-image
+#   source:
+#     repository: trivigy/discord-resource
+
+resources:
+- name: kube
+  type: kube
+  icon: docker
+  source:
+    server: ((kube.cluster_url))
+    certificate_authority: ((kube.cluster_ca))
+    token: ((kube.token))
+# - name: discord
+#   type: discord
+#   icon: discord
+#   check_every: 999999h
+#   source:
+#     token: ((discord.token))
+- name: source
+  type: git
+  icon: github-circle
+  source:
+    uri: git@github.com:hreeder/kube-iac.git
+    private_key: |-
+      ((github.deploy_key))
+    git_crypt_key: |-
+      ((github.git_crypt_key))
+    paths:
+    - logging/*
+    - secrets/kibana.yaml
+
+jobs:
+- name: namespace
+  plan:
+  - get: source
+    trigger: true
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/00-namespace.yaml
+
+- name: elasticsearch
+  plan:
+  - get: source
+    trigger: true
+    passed:
+    - namespace
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/es-01-service.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/es-02-statefulset.yaml
+      wait_until_ready: 0
+
+- name: kibana
+  plan:
+  - get: source
+    trigger: true
+    passed:
+    - elasticsearch
+  - put: kube
+    params:
+      kubectl: apply -f source/secrets/kibana.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/kib-01-service.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/kib-02-configmap.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/kib-03-deployment.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/kib-04-ingress.yaml
+      wait_until_ready: 0
+
+- name: fluentd
+  plan:
+  - get: source
+    trigger: true
+    passed:
+    - elasticsearch
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/fd-01-serviceaccount.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/fd-02-clusterrole.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/fd-03-clusterrolebinding.yaml
+      wait_until_ready: 0
+  - put: kube
+    params:
+      kubectl: apply -f source/logging/fd-04-daemonset.yaml
+      wait_until_ready: 0
