@@ -20,8 +20,10 @@ secrets:
   create: false
 
 persistence:
-  worker:
-    storageClass: do-block-storage
+  enabled: false
+
+worker:
+  emptyDirSize: 40Gi
 
 concourse:
   worker:
