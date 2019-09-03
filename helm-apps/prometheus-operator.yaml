@@ -10,3 +10,10 @@ grafana:
     enabled: true
     hosts:
       - grafana.tbrb.dev
+
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+    - job_name: 'mc_host'
+      static_configs:
+      - targets: ['survival.sorcerermjolnir.net:9100']
