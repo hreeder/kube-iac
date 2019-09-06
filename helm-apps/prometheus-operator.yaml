@@ -4,16 +4,51 @@ meta:
   chart: stable/prometheus-operator
   extra:
     - grafana_dashboards/harry-all-nodes.yaml
+    - grafana_dashboards/minecraft-server.yaml
 
 grafana:
   ingress:
     enabled: true
     hosts:
       - grafana.tbrb.dev
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      node-exporter:
+        gnetId: 1860
+        revision: 14
+        datasource: Prometheus
 
 prometheus:
   prometheusSpec:
     additionalScrapeConfigs:
-    - job_name: 'mc_host'
+    - job_name: 'minecraft'
       static_configs:
-      - targets: ['survival.sorcerermjolnir.net:9100']
+      - targets:
+        - 'survival.sorcerermjolnir.net:9100'
+        - 'survival.sorcerermjolnir.net:9125'
+
+prometheus-node-exporter:
+  service:
+    port: 30206
+    targetPort: 30206
+
+kubeEtcd:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
