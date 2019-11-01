@@ -23,7 +23,7 @@ persistence:
   enabled: false
 
 worker:
-  emptyDirSize: 40Gi
+  emptyDirSize: 70Gi
 
 concourse:
   worker:
