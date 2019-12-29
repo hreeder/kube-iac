@@ -1,7 +1,10 @@
 ---
 meta:
   name: concourse
-  chart: stable/concourse
+  chart: concourse/concourse
+  repo:
+    name: concourse
+    url: https://concourse-charts.storage.googleapis.com/
   database: concourse.yaml
   secrets:
     - concourse-web.yaml

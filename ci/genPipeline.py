@@ -77,7 +77,7 @@ for app in apps:
             if "namespace" in app:
                 secret_task['params']['namespace'] = app['namespace']
 
-            secrets_job['plan'].append(secret_task)        
+            secrets_job['plan'].append(secret_task)
 
         pipeline['jobs'].append(secrets_job)
         group['jobs'].append(secrets_job['name'])
@@ -133,7 +133,7 @@ for app in apps:
 
             if "namespace" in app:
                 extra_resource_task['params']['namespace'] = app['namespace']
-            
+
             extra_job['plan'].append(extra_resource_task)
 
         if "database" in app:
@@ -184,7 +184,7 @@ for app in apps:
 
     if "namespace" in app:
         job['plan'][1]['params']['namespace'] = app['namespace']
-    
+
     if "extra" in app:
         job['plan'][0]['passed'] = [f"{app['name']}-extra-resources"]
     elif "database" in app:
@@ -204,5 +204,5 @@ for resource in pipeline['resources']:
                 "name": repo.name,
                 "url": repo.url
             })
-
+del pipeline['groups']
 yaml.dump(pipeline, sys.stdout)
